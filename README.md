@@ -254,6 +254,12 @@ Here are the interface bindings:
     }
 ```
 
+All together
+============
+
+Finally, here is the combined overall picture - and configuration. Hopefully it convinces the reader that is was worth to go over the configuration step-by-step:
+
+![ALL](./4_all.png)
 
 ```
 firewall {
@@ -335,6 +341,9 @@ firewall {
     name WAN_IN {
         default-action drop
         description "incoming on WAN"
+
+        /* Rules allowing WAN -> DMZ connections go here. */
+
         rule 1 {
             action drop
             description "WAN new & invalid"
@@ -401,3 +410,4 @@ interfaces {
     }
 }
 ```
+-------
