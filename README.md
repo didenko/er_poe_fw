@@ -1,7 +1,7 @@
-_*This is a DRAFT. DO NOT USE for constructing a production firewall configuration.*_
+`THIS IS A DRAFT.  DO NOT USE for constructing a production firewall configuration.`
 
-EdgeMax firewall study
-======================
+EdgeMax firewall basic rules
+============================
 
 There are a few templates on the Internet for configuring firewall rules on Ubiquiti _EdgeRouter_ but no from-scratch guide which may be preferred for better understanding. Also, for visual people at least some imagery may be helpful.
 
@@ -170,6 +170,8 @@ As pictured above, hosts from _DMZ_ should not reach the router itself (the `loc
     }
 ```
 
+Note, that the `DMZ_LOCAL` rule set is empty - we want to dismiss all traffic on that path, so default `drop` action does the job. There are no rules to match, so all traffic fill fall through to the default action.
+
 As before, it is necessary to bind the rule sets to relevant interface - `switch0`:
 
 ```
@@ -190,6 +192,68 @@ As before, it is necessary to bind the rule sets to relevant interface - `switch
         }
     }
 ```
+
+Internet traffic
+----------------
+
+There are two types of traffic from _WAN_ permitted to pass through the router:
+
+0. Any valid communication over already established connections. Presumably most of the connection will be established on requests from _LAN_ and _DMZ_.
+
+0. New connection requests to explicitly permitted _host:port_ combinations in DMZ.
+
+![WAN](./3_wan.png)
+
+When considering actual configuration this example does not provide an example of how to allow a new connection path to DMZ. Such configuration rule should go before the first rule in the `WAN_IN` rule set. Allowing connections from _WAN_ to _DMZ_ sides is a more complex topic and solutions vary depending on the type of application which traffic is being allowed.
+
+The example also omits throttling and other traffic limits to help with DDOS and similar traffic.
+
+```
+    name WAN_IN {
+        default-action drop
+        description "incoming on WAN"
+
+        /* Rules allowing WAN -> DMZ connections go here. */
+
+        rule 1 {
+            action drop
+            description "WAN new & invalid"
+            state {
+                invalid enable
+                new enable
+            }
+        }
+        rule 2 {
+            action accept
+            description "WAN valid established"
+            state {
+                established enable
+                related enable
+            }
+        }
+    }
+    name WAN_LOCAL {
+        default-action drop
+        description "WAN to router"
+    }
+```
+
+Here are the interface bindings:
+
+```
+    ethernet eth1 {
+        description WAN
+        firewall {
+            in {
+                name WAN_IN
+            }
+            local {
+                name WAN_LOCAL
+            }
+        }
+    }
+```
+
 
 ```
 firewall {
