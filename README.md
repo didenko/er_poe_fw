@@ -52,6 +52,58 @@ The type and handling of traffic is shown with colors and shapes of lines and ba
 Local network
 -------------
 
+The _LAN_ network is the most permissive for traffic flowing out of it, yet it also needs to have some safety guards for traffic coming from other directions. Valid incoming traffic  (the `in` direction) is allowed to flow to any other destination, while only valid established connections' traffic is allowed to leave from the router into the _LAN_ network (the `out` direction).
+
+![LAN](./1_lan.png)
+
+The configuration excerpt demonstrates the _LAN_-related rule sets:
+
+```
+firewall {
+    name LAN_IN {
+        default-action drop
+        description "incoming on LAN"
+        rule 1 {
+            action drop
+            description "LAN invalid"
+            state {
+                invalid enable
+            }
+        }
+        rule 2 {
+            action accept
+            description "LAN all valid"
+            state {
+                established enable
+                new enable
+                related enable
+            }
+        }
+    }
+    name LAN_OUT {
+        default-action drop
+        description "LAN outcoming"
+        rule 1 {
+            action drop
+            description "LAN new & invalid"
+            state {
+                invalid enable
+                new enable
+            }
+        }
+        rule 2 {
+            action accept
+            description "LAN valid existing"
+            state {
+                established enable
+                related enable
+            }
+        }
+    }
+...
+```
+
+You may notice the similar rule pattern in configuration examples below: first come rules which drop as much traffic as reasonable to avoid unnecessary processing. Then come permissive rules, which accept the permitted traffic. Finally, the rule set's `default-action` clause set to `drop` which discards all unrecognized traffic as a safety precaution.
 
 ```
 firewall {
