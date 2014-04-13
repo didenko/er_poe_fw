@@ -1,9 +1,38 @@
 EdgeMax firewall study
 ======================
 
-There are a few templates on the Internet for configuring firewall rules on Ubiquiti _EdgeRouter_ but no from-scratch guide which may be prefered for better understanding. Also, for visual people at least some imagery may be helpful.
+There are a few templates on the Internet for configuring firewall rules on Ubiquiti _EdgeRouter_ but no from-scratch guide which may be preferred for better understanding. Also, for visual people at least some imagery may be helpful.
 
-This write-up walk through a SOHO firewall rules configuration reasoning. It assumes a SOHO setup on _EdgeRouter POE_ with three networks: _LAN_, _WAN_, and _DMZ_. The _LAN_ network is on the single Ethernet connection on `eth0` port of the router. The _WAN_ network is essentially an ethernnet link up to an ISP port via `eth1` port. There are not more than three devices on _DMZ_ in this example, so we will use the build-in switch for that purpose. The `eth2`, `eth3`, and `eth4` ports are assigned to `switch0` interface and all firewall rules then consider only `switch0` as _DMZ_ network interface.
+While presenting configuration examples in this write-up, the configuration code is simplified to capture the concepts. In firewall riles `disabled` filters are not shown, unless relevant for understanding. Other lines not relevant in a context of the paragraph are omitted as well. Finally, empty bracket sequences are also dropped.
+
+Interfaces
+----------
+
+This write-up walks through a SOHO firewall rules configuration reasoning. It assumes a SOHO setup on _EdgeRouter POE_ with three networks: _LAN_, _WAN_, and _DMZ_. The _LAN_ network is on the single Ethernet connection on `eth0` port of the router. The _WAN_ network is essentially an Ethernet link up to an ISP port via `eth1` port. There are not more than three devices on _DMZ_ in this example, so we will use the build-in switch for that purpose. The `eth2`, `eth3`, and `eth4` ports are assigned to `switch0` interface and all firewall rules then consider only `switch0` as _DMZ_ network interface.
+
+Here is the relevant extract from the configuration:
+
+```
+interfaces {
+    ethernet eth0 {
+        description LAN
+    }
+    ethernet eth1 {
+        description WAN
+    }
+    ethernet eth2
+    ethernet eth3
+    ethernet eth4
+    switch switch0 {
+        description DMZ
+        switch-port {
+            interface eth2
+            interface eth3
+            interface eth4
+        }
+    }
+}
+```
 
 ```
 firewall {
