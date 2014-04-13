@@ -1,3 +1,5 @@
+_*This is a DRAFT. DO NOT USE for constructing a production firewall configuration.*_
+
 EdgeMax firewall study
 ======================
 
