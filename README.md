@@ -105,6 +105,22 @@ firewall {
 
 You may notice the similar rule pattern in configuration examples below: first come rules which drop as much traffic as reasonable to avoid unnecessary processing. Then come permissive rules, which accept the permitted traffic. Finally, the rule set's `default-action` clause set to `drop` which discards all unrecognized traffic as a safety precaution.
 
+In addition to configuring the rule sets we also need to bind them to interface configuration, like this:
+
+```
+    ethernet eth0 {
+        description LAN
+        firewall {
+            in {
+                name LAN_IN
+            }
+            out {
+                name LAN_OUT
+            }
+        }
+    }
+```
+
 ```
 firewall {
     name DMZ_IN {
