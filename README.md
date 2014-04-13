@@ -3,7 +3,7 @@ EdgeMax firewall study
 
 There are a few templates on the Internet for configuring firewall rules on Ubiquiti _EdgeRouter_ but no from-scratch guide which may be preferred for better understanding. Also, for visual people at least some imagery may be helpful.
 
-While presenting configuration examples in this write-up, the configuration code is simplified to capture the concepts. In firewall riles `disabled` filters are not shown, unless relevant for understanding. Other lines not relevant in a context of the paragraph are omitted as well. Finally, empty bracket sequences are also dropped.
+While presenting configuration examples in this write-up, the configuration code is simplified to capture the concepts. In firewall riles `disabled` filters are not shown, unless relevant for understanding. Other lines not relevant in a paragraph context are omitted as well. Finally, empty bracket sequences are also dropped.
 
 Interfaces
 ----------
@@ -33,6 +33,20 @@ interfaces {
     }
 }
 ```
+
+Canvas
+------
+
+First the configuration will be presented in visual form on a canvas, like this:
+
+![Canvas](./0_canvas.png)
+
+The main area is a four-sided field, where three sides dedicated to _LAN_, _DMZ_, and _WAN_ interfaces, as marked. The fourth, right, side does not correspond to an interface, but rather to the `local` traffic destination, designated for the router management.
+
+Each canvas side is divided in two parts, which correspond to `in` and `out` traffic directions. Traffic always flows from an `in` to an `out` on the canvas, including the imaginary `local` "`out`". If line does not extend deep into canvas on an `in` side, it means "to any destination". Likewise if a line does not extend deep into canvas on an `out` side, it means "from any source".
+
+The type and handling of traffic is shown with colors and shapes of lines and badges in the legend below the canvas above.
+
 
 ```
 firewall {
