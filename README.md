@@ -66,13 +66,6 @@ firewall {
         default-action drop
         description "incoming on LAN"
         rule 1 {
-            action drop
-            description "LAN invalid"
-            state {
-                invalid enable
-            }
-        }
-        rule 2 {
             action accept
             description "LAN all valid"
             state {
@@ -81,19 +74,18 @@ firewall {
                 related enable
             }
         }
+        rule 2 {
+            action drop
+            description "LAN invalid"
+            state {
+                invalid enable
+            }
+        }
     }
     name LAN_OUT {
         default-action drop
         description "LAN outcoming"
         rule 1 {
-            action drop
-            description "LAN new & invalid"
-            state {
-                invalid enable
-                new enable
-            }
-        }
-        rule 2 {
             action accept
             description "LAN valid existing"
             state {
@@ -101,11 +93,19 @@ firewall {
                 related enable
             }
         }
+        rule 2 {
+            action drop
+            description "LAN new & invalid"
+            state {
+                invalid enable
+                new enable
+            }
+        }
     }
 ...
 ```
 
-You may notice the similar rule pattern in configuration examples below: first come rules which drop as much traffic as reasonable to avoid unnecessary processing. Then come permissive rules, which accept the permitted traffic. Finally, the rule set's `default-action` clause set to `drop` which discards all unrecognized traffic as a safety precaution.
+You may notice the similar rule pattern in configuration examples below: first come rules which are percieved to match most common packets - mostly those are permissive rules. Then come other, less frequently matched  rules. Finally, the rule set's `default-action` clause set to `drop` which discards all unrecognized traffic as a safety precaution. Note that it may not always be possible to order rules by a perceived frequency of matching, as rules may need another logical order for the rule set to make sense.
 
 In addition to configuring the rule sets we also need to bind them to interface configuration, like this:
 
@@ -137,10 +137,11 @@ As pictured above, hosts from _DMZ_ should not reach the router itself (the `loc
         default-action drop
         description "incoming on DMZ"
         rule 1 {
-            action drop
-            description "DMZ invalid"
+            action accept
+            description "DMZ valid established"
             state {
-                invalid enable
+                established enable
+                related enable
             }
         }
         rule 2 {
@@ -156,11 +157,10 @@ As pictured above, hosts from _DMZ_ should not reach the router itself (the `loc
             }
         }
         rule 3 {
-            action accept
-            description "DMZ valid established"
+            action drop
+            description "DMZ invalid"
             state {
-                established enable
-                related enable
+                invalid enable
             }
         }
     }
@@ -204,7 +204,7 @@ There are two types of traffic from _WAN_ permitted to pass through the router:
 
 ![WAN](img/3_wan.png)
 
-When considering actual configuration this example does not provide an example of how to allow a new connection path to DMZ. Such configuration rule should go before the first rule in the `WAN_IN` rule set. Allowing connections from _WAN_ to _DMZ_ sides is a more complex topic and solutions vary depending on the type of application which traffic is being allowed.
+When considering actual configuration this example does not provide an example of how to allow a new connection path to DMZ. Such configuration rule should go after the first rule in the `WAN_IN` rule set. Allowing connections from _WAN_ to _DMZ_ sides is a more complex topic and solutions vary depending on the type of application which traffic is being allowed.
 
 The example also omits throttling and other traffic limits to help with DDOS and similar traffic.
 
@@ -212,23 +212,23 @@ The example also omits throttling and other traffic limits to help with DDOS and
     name WAN_IN {
         default-action drop
         description "incoming on WAN"
-
-        /* Rules allowing WAN -> DMZ connections go here. */
-
         rule 1 {
-            action drop
-            description "WAN new & invalid"
-            state {
-                invalid enable
-                new enable
-            }
-        }
-        rule 2 {
             action accept
             description "WAN valid established"
             state {
                 established enable
                 related enable
+            }
+        }
+
+        /* Rules allowing WAN -> DMZ connections go here. */
+
+        rule 2 {
+            action drop
+            description "WAN new & invalid"
+            state {
+                invalid enable
+                new enable
             }
         }
     }
@@ -267,10 +267,11 @@ firewall {
         default-action drop
         description "incoming on DMZ"
         rule 1 {
-            action drop
-            description "DMZ invalid"
+            action accept
+            description "DMZ valid established"
             state {
-                invalid enable
+                established enable
+                related enable
             }
         }
         rule 2 {
@@ -286,11 +287,10 @@ firewall {
             }
         }
         rule 3 {
-            action accept
-            description "DMZ valid established"
+            action drop
+            description "DMZ invalid"
             state {
-                established enable
-                related enable
+                invalid enable
             }
         }
     }
@@ -302,13 +302,6 @@ firewall {
         default-action drop
         description "incoming on LAN"
         rule 1 {
-            action drop
-            description "LAN invalid"
-            state {
-                invalid enable
-            }
-        }
-        rule 2 {
             action accept
             description "LAN all valid"
             state {
@@ -317,19 +310,18 @@ firewall {
                 related enable
             }
         }
+        rule 2 {
+            action drop
+            description "LAN invalid"
+            state {
+                invalid enable
+            }
+        }
     }
     name LAN_OUT {
         default-action drop
         description "LAN outcoming"
         rule 1 {
-            action drop
-            description "LAN new & invalid"
-            state {
-                invalid enable
-                new enable
-            }
-        }
-        rule 2 {
             action accept
             description "LAN valid existing"
             state {
@@ -337,27 +329,35 @@ firewall {
                 related enable
             }
         }
-    }
-    name WAN_IN {
-        default-action drop
-        description "incoming on WAN"
-
-        /* Rules allowing WAN -> DMZ connections go here. */
-
-        rule 1 {
+        rule 2 {
             action drop
-            description "WAN new & invalid"
+            description "LAN new & invalid"
             state {
                 invalid enable
                 new enable
             }
         }
-        rule 2 {
+    }
+    name WAN_IN {
+        default-action drop
+        description "incoming on WAN"
+        rule 1 {
             action accept
             description "WAN valid established"
             state {
                 established enable
                 related enable
+            }
+        }
+
+        /* Rules allowing WAN -> DMZ connections go here. */
+
+        rule 2 {
+            action drop
+            description "WAN new & invalid"
+            state {
+                invalid enable
+                new enable
             }
         }
     }
