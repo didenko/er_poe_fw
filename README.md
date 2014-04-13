@@ -123,6 +123,74 @@ In addition to configuring the rule sets we also need to bind them to interface 
     }
 ```
 
+Perimeter network
+-----------------
+
+The _DMZ_ side implements a [perimeter network](http://en.wikipedia.org/wiki/DMZ_%28computing%29). The intent is to allow limited controlled access to hosts in DMZ from public Internet (_WAN_ side), while restricting their access to _LOCAL_ and _LAN_ destinations. Here is the graphical representation of intended flows:
+
+![DMZ](./2_dmz.png)
+
+As pictured above, hosts from _DMZ_ should not reach the router itself (the `local` direction) with any traffic. They should be able to respond to all queries from _LAN_, so _DMZ_ `in` allows valid established traffic towards _LAN_. Host in DMZ should also have unrestricted access to public Internet, so there is an explicit rule accepting new connections from _DMZ_ to _WAN_. Here is the configuration excerpt:
+
+```
+    name DMZ_IN {
+        default-action drop
+        description "incoming on DMZ"
+        rule 1 {
+            action drop
+            description "DMZ invalid"
+            state {
+                invalid enable
+            }
+        }
+        rule 2 {
+            action accept
+            description "DMZ new to WAN"
+            destination {
+                group {
+                    address-group ADDRv4_eth1
+                }
+            }
+            state {
+                new enable
+            }
+        }
+        rule 3 {
+            action accept
+            description "DMZ valid established"
+            state {
+                established enable
+                related enable
+            }
+        }
+    }
+    name DMZ_LOCAL {
+        default-action drop
+        description "DMZ to router"
+    }
+```
+
+As before, it is necessary to bind the rule sets to relevant interface - `switch0`:
+
+```
+    switch switch0 {
+        description DMZ
+        firewall {
+            in {
+                name DMZ_IN
+            }
+            local {
+                name DMZ_LOCAL
+            }
+        }
+        switch-port {
+            interface eth2
+            interface eth3
+            interface eth4
+        }
+    }
+```
+
 ```
 firewall {
     name DMZ_IN {
@@ -138,6 +206,11 @@ firewall {
         rule 2 {
             action accept
             description "DMZ new to WAN"
+            destination {
+                group {
+                    address-group ADDRv4_eth1
+                }
+            }
             state {
                 new enable
             }
