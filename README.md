@@ -43,11 +43,11 @@ Canvas
 
 First the configuration will be presented in visual form on a canvas, like this:
 
-![Canvas](./0_canvas.png)
+![Canvas](img/0_canvas.png)
 
 The main area is a four-sided field, where three sides dedicated to _LAN_, _DMZ_, and _WAN_ interfaces, as marked. The fourth, right, side does not correspond to an interface, but rather to the `local` traffic destination, designated for the router management.
 
-Each canvas side is divided in two parts, which correspond to `in` and `out` traffic directions. Traffic always flows from an `in` to an `out` on the canvas, including the imaginary `local` "`out`". If line does not extend deep into canvas on an `in` side, it means "to any destination". Likewise if a line does not extend deep into canvas on an `out` side, it means "from any source".
+Each canvas side is divided in two parts, which correspond to `in` and `out` traffic directions. Traffic always flows from an `in` to an `out` on the canvas, including the imaginary `local` "`out`". If a line does not extend deep into canvas on an `in` side, it depicts traffic flowing "to any destination". Likewise if a line does not extend deep into canvas on an `out` side, it depicts traffic flowing "from any source".
 
 The type and handling of traffic is shown with colors and shapes of lines and badges in the legend below the canvas above.
 
@@ -56,7 +56,7 @@ Local network
 
 The _LAN_ network is the most permissive for traffic flowing out of it, yet it also needs to have some safety guards for traffic coming from other directions. Valid incoming traffic  (the `in` direction) is allowed to flow to any other destination, while only valid established connections' traffic is allowed to leave from the router into the _LAN_ network (the `out` direction).
 
-![LAN](./1_lan.png)
+![LAN](img/1_lan.png)
 
 The configuration excerpt demonstrates the _LAN_-related rule sets:
 
@@ -128,7 +128,7 @@ Perimeter network
 
 The _DMZ_ side implements a [perimeter network](http://en.wikipedia.org/wiki/DMZ_%28computing%29). The intent is to allow limited controlled access to hosts in DMZ from public Internet (_WAN_ side), while restricting their access to _LOCAL_ and _LAN_ destinations. Here is the graphical representation of intended flows:
 
-![DMZ](./2_dmz.png)
+![DMZ](img/2_dmz.png)
 
 As pictured above, hosts from _DMZ_ should not reach the router itself (the `local` direction) with any traffic. They should be able to respond to all queries from _LAN_, so _DMZ_ `in` allows valid established traffic towards _LAN_. Host in DMZ should also have unrestricted access to public Internet, so there is an explicit rule accepting new connections from _DMZ_ to _WAN_. Here is the configuration excerpt:
 
@@ -202,7 +202,7 @@ There are two types of traffic from _WAN_ permitted to pass through the router:
 
 0. New connection requests to explicitly permitted _host:port_ combinations in DMZ.
 
-![WAN](./3_wan.png)
+![WAN](img/3_wan.png)
 
 When considering actual configuration this example does not provide an example of how to allow a new connection path to DMZ. Such configuration rule should go before the first rule in the `WAN_IN` rule set. Allowing connections from _WAN_ to _DMZ_ sides is a more complex topic and solutions vary depending on the type of application which traffic is being allowed.
 
@@ -259,7 +259,7 @@ All together
 
 Finally, here is the combined overall picture - and configuration. Hopefully it convinces the reader that is was worth to go over the configuration step-by-step:
 
-![ALL](./4_all.png)
+![ALL](img/4_all.png)
 
 ```
 firewall {
