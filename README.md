@@ -9,6 +9,13 @@ As usual, there are many way to skin a cat. Although there are good practices fo
 
 While presenting configuration examples in this write-up, the configuration code is simplified to capture the concepts. In firewall riles `disabled` filters are not shown, unless relevant for understanding. Other lines not relevant in a paragraph context are omitted as well. Finally, empty bracket sequences are also dropped.
 
+0. [Interfaces](#interfaces)
+0. [Canvas](#canvas)
+0. [Local network](#local-network)
+0. [Perimeter network](#perimeter-network)
+0. [Internet traffic](#internet-traffic)
+0. [All together](#all-together)
+
 Interfaces
 ----------
 
